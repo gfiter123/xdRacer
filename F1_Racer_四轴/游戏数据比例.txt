@@ -1,0 +1,105 @@
+F1-2013
+
+
+
+OutExtra *extra = (OutExtra *)m_szRecvBuf;
+	axis1 = extra->fl_sus;//suspension travel front left;
+	axis2 =	extra->fr_sus;//suspension travel front right;
+	axis3 = extra->rl_sus;//suspension travel rear left;
+	axis4 = extra->rr_sus;//suspension travel rear right;
+	AvaCrest(axis1,axis2,axis3,axis4);
+	
+	if (axis1 >= MAX_AXIS_LONG/2-2)
+	{
+		axis1 = MAX_AXIS_LONG/2-2;
+	}
+	if (axis1 <= -MAX_AXIS_LONG/2+2)
+	{
+		axis1 = -MAX_AXIS_LONG/2+2;
+	}
+	if (axis2 >= MAX_AXIS_LONG/2-2)
+	{
+		axis2 = MAX_AXIS_LONG/2-2;
+	}
+	if (axis2 <= -MAX_AXIS_LONG/2+2)
+	{
+		axis2 = -MAX_AXIS_LONG/2+2;
+	}
+	if (axis3 >= MAX_AXIS_LONG/2-2)
+	{
+		axis3 = MAX_AXIS_LONG/2-2;
+	}
+	if (axis3 <= -MAX_AXIS_LONG/2+2)
+	{
+		axis3 = -MAX_AXIS_LONG/2+2;
+	}
+	if (axis4 >= MAX_AXIS_LONG/2-2)
+	{
+		axis4 = MAX_AXIS_LONG/2-2;
+	}
+	if (axis4 <= -MAX_AXIS_LONG/2+2)
+	{
+		axis4 = -MAX_AXIS_LONG/2+2;
+	}
+	
+	axis1 += extra->fl_sh * 0.05;
+	axis2 += extra->fr_sh * 0.05;
+	axis3 += extra->rl_sh * 0.05;
+	axis4 += extra->rr_sh * 0.05;
+
+	SendMessageW(GetDlgItem(m_parent,IDS_AXIS1),TBM_SETPOS, (WPARAM)1,(LPARAM)(int)(axis1*65535/MAX_AXIS_LONG));
+	SendMessageW(GetDlgItem(m_parent,IDS_AXIS2),TBM_SETPOS, (WPARAM)1,(LPARAM)(int)(axis2*65535/MAX_AXIS_LONG));
+	SendMessageW(GetDlgItem(m_parent,IDS_AXIS3),TBM_SETPOS, (WPARAM)1,(LPARAM)(int)(axis3*65535/MAX_AXIS_LONG));
+	SendMessageW(GetDlgItem(m_parent,IDS_AXIS4),TBM_SETPOS, (WPARAM)1,(LPARAM)(int)(axis4*65535/MAX_AXIS_LONG));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	return 1;
