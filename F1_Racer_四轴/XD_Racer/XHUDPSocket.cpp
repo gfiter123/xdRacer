@@ -4,10 +4,10 @@
 #include "XD_OutSim.h"
 #include <stdio.h>
 #include <math.h>
-
+#include "XH_INPUTTOAXIS.h"
 #include <commctrl.h>
-int   AVE_N;
-int   M_Q;
+
+
 XHUDPSocket::XHUDPSocket(void)
 {
 	m_nPort = 0;
@@ -103,154 +103,6 @@ SOCKET XHUDPSocket::GetSocket()
 	return m_sock;
 }
 
-struct Axis_Struct
-{
-	float axis1;
-	float axis2;
-	float axis3;
-	float axis4;
-};
-Axis_Struct *axis_Struct;
-InitCoordinates initCoor;
-void AvaCrest(float &axis1,float &axis2,float &axis3,float & axis4)
-{
-	
-	
-	float ax1 = axis1;
-	float ax2 = axis2;
-	float ax3 = axis3;
-	float ax4 = axis4;
-
-	for(int i = 0;i < AVE_N -1 ;i++)
-	{
-		axis_Struct[i] = axis_Struct[i+1];
-		
-	}
-	axis_Struct[AVE_N -1].axis1 = axis1;
-	axis_Struct[AVE_N -1].axis2 = axis2;
-	axis_Struct[AVE_N -1].axis3 = axis3;
-	axis_Struct[AVE_N -1].axis4 = axis4;
-
-	
-	for (int i = 0; i< AVE_N - 1;i++)
-	{
-		ax1 += axis_Struct[i].axis1;
-		ax2 += axis_Struct[i].axis2;
-		ax3 += axis_Struct[i].axis3;
-		ax4 += axis_Struct[i].axis4;
-	}
-
-	axis1 = ax1 / AVE_N;
-	axis2 = ax2 / AVE_N;
-	axis3 = ax3 / AVE_N;
-	axis4 = ax4 / AVE_N;
-}
-
-InputVector * inputAva;
-void AvaOula(InputVector &input)
-{
-	
-
-	InputVector temp = {0};
-	for(int i = 0;i < AVE_N -1 ;i++)
-	{
-		inputAva[i] = inputAva[i+1];
-
-	}
-	inputAva[AVE_N -1] =  input;
-
-
-
-	for (int i = 0; i< AVE_N - 1;i++)
-	{
-		temp = temp + inputAva[i];
-		
-	}
-
-	input = temp / AVE_N;
-	
-}
-void KaermanCrest(float &axis1,float &axis2,float &axis3,float & axis4)
-{
-	float m_xMid[4];
-	float m_pMid[4];
-	static float m_xLast[4] = {0};
-	static float m_pLast[4] = {0};
-	float m_kg[4];
-	float m_pNow[4];
-	float m_xNow[4];
-	float ax[4];
-	ax[0] = axis1;
-	ax[1] = axis2;
-	ax[2] = axis3;
-	ax[3] = axis4;
-	for (int i=0;i < 4;i++)
-	{
-		m_xMid[i] = m_xLast[i];
-		m_pMid[i] = sqrt(m_pLast[i]* m_pLast[i] + M_Q * M_Q);
-		m_kg[i] = pow(m_pMid[i],2)/(pow(m_pMid[i],2) + M_Q * M_Q);
-		m_xNow[i] = m_xMid[i] + m_kg[i]*(ax[i] - m_xMid[i]);
-		m_pNow[i] = sqrt((1 - m_kg[i]) * m_pMid[i] * m_pMid[i]);
-		m_xLast[i] = m_xNow[i];
-		m_pLast[i] = m_pNow[i];
-	}
-	axis1 = m_xNow[0];
-	axis2 = m_xNow[1];
-	axis3 = m_xNow[2];
-	axis4 = m_xNow[3];
-}
-
-InputVector sqrt(InputVector x)
-{
-	InputVector temp;
-	temp.a = sqrt(x.a);
-	temp.b = sqrt(x.b);
-	temp.c = sqrt(x.c);
-	temp.x = sqrt(x.x);
-	temp.y = sqrt(x.y);
-	temp.z = sqrt(x.z);
-	return temp;
-}
-InputVector inPow(InputVector x,float n)
-{
-	InputVector temp;
-	temp.a = (float)pow(x.a,n);
-	temp.b = (float)pow(x.b,n);
-	temp.c = (float)pow(x.c,n);
-	temp.x = (float)pow(x.x,n);
-	temp.y = (float)pow(x.y,n);
-	temp.z = (float)pow(x.z,n);
-	return temp;
-}
-void KaermanOula(InputVector &input)
-{
-	InputVector m_xMid;
-	InputVector m_pMid;
-	static InputVector m_xLast = {0};
-	static InputVector m_pLast = {0};
-	InputVector m_kg;
-	InputVector m_pNow;
-	InputVector m_xNow;
-	InputVector ax = input;
-	
-	m_xMid = m_xLast;
-	m_pMid = sqrt(m_pLast* m_pLast + M_Q * M_Q);
-	m_kg = inPow(m_pMid,2.0)/(inPow(m_pMid,2.0) + M_Q * M_Q);
-	m_xNow = m_xMid + m_kg*(ax - m_xMid);
-	m_pNow.a = sqrt((1 - m_kg.a) * m_pMid.a * m_pMid.a);
-	m_pNow.b = sqrt((1 - m_kg.b) * m_pMid.b * m_pMid.b);
-	m_pNow.c = sqrt((1 - m_kg.c) * m_pMid.c * m_pMid.c);
-	m_pNow.x = sqrt((1 - m_kg.x) * m_pMid.x * m_pMid.x);
-	m_pNow.y = sqrt((1 - m_kg.y) * m_pMid.y * m_pMid.y);
-	m_pNow.z = sqrt((1 - m_kg.z) * m_pMid.z * m_pMid.z);
-
-	m_xLast = m_xNow;
-	m_pLast = m_pNow;
-
-	input = m_xNow;
-
-
-}
 bool XHUDPSocket::AnalysisData_exa()
 {
 	OutExtra *extra = (OutExtra *)m_szRecvBuf;
@@ -306,101 +158,7 @@ bool XHUDPSocket::AnalysisData_exa()
 
 }
 
-static void TakeMaxAxis(float& axis1,float& axis2,float& axis3,float& axis4)
-{
-	static float oldAx1 = 0.0;
-	static float oldAx2 = 0.0;
-	static float oldAx3 = 0.0;
-	static float oldAx4 = 0.0;
-	float fMaxAxisLong = MAX_AXIS_LONG / 2;
-	float ax1 = axis1,ax2 = axis2,ax3 = axis3,ax4 = axis4;
-	if (axis1 >= fMaxAxisLong)
-	{
-		if (oldAx1 > axis1)
-		{
-			ax1 = fMaxAxisLong - oldAx1 + axis1;
-		}
-		else
-			ax1 = fMaxAxisLong;
-	}
-	if (axis1 <= -fMaxAxisLong)
-	{
-		if (oldAx1 < axis1)
-		{
-			ax1 = -fMaxAxisLong +  axis1 - oldAx1;
-		}
-		else
-			ax1 = -fMaxAxisLong;
-	}
 
-	if (axis2 >= fMaxAxisLong)
-	{
-		if (oldAx2 > axis2)
-		{
-			ax2 = fMaxAxisLong - oldAx2 + axis2;
-		}
-		else
-			ax2 = fMaxAxisLong;
-	}
-	if (axis2 <= -fMaxAxisLong)
-	{
-		if (oldAx2 < axis2)
-		{
-			ax2 = -fMaxAxisLong +  axis2 - oldAx2;
-		}
-		else
-			ax2 = -fMaxAxisLong;
-	}
-
-	if (axis3 >= fMaxAxisLong)
-	{
-		if (oldAx3 > axis3)
-		{
-			ax3 = fMaxAxisLong - oldAx3 + axis3;
-		}
-		else
-			ax3 = fMaxAxisLong;
-	}
-	if (axis3 <= -fMaxAxisLong)
-	{
-		if (oldAx3 < axis3)
-		{
-			ax3 = -fMaxAxisLong +  axis3 - oldAx3;
-		}
-		else
-			ax3 = -fMaxAxisLong;
-	}
-
-	if (axis4 >= fMaxAxisLong)
-	{
-		if (oldAx4 > axis4)
-		{
-			ax4 = fMaxAxisLong - oldAx4 + axis4;
-		}
-		else
-			ax4 = fMaxAxisLong;
-	}
-	if (axis4 <= -fMaxAxisLong)
-	{
-		if (oldAx4 < axis4)
-		{
-			ax4 = -fMaxAxisLong +  axis4 - oldAx4;
-		}
-		else
-			ax4 = -fMaxAxisLong;
-	}
-
-
-	oldAx1 = axis1;
-	oldAx2 = axis2;
-	oldAx3 = axis3;
-	oldAx4 = axis4;
-	axis1 = ax1;
-	axis2 = ax2;
-	axis3 = ax3;
-	axis4 = ax4;
-
-}
 
 
 bool XHUDPSocket::AnalysisData_sim()
@@ -428,7 +186,7 @@ bool XHUDPSocket::AnalysisData_sim()
 		initCoor.XHVariable[i] = xhVariable[i];
 	}
 
-	InputVector input;
+	
 	input.a = 0;//sim->Roll;
 	input.b = 0;//sim->Pitch;
 	input.c = 0;
@@ -437,21 +195,6 @@ bool XHUDPSocket::AnalysisData_sim()
 	input.z = sim->Accel.z;
 
 
-	AvaOula(input);
-	KaermanOula(input);
-	OutputVector output;
-	GetXD_DOFData(&input,&output);
-
-	axis1 = output.l1;
-	axis2 = output.l2;
-	axis3 = output.l3;
-	axis4 = output.l4;
-	
-	
-	//AvaCrest(axis1,axis2,axis3,axis4);
-	//KaermanCrest(axis1,axis2,axis3,axis4);
-	TakeMaxAxis(axis1,axis2,axis3,axis4);
-	
 	SetEvent(hEvent);
 	ShowLog("setevevt");
 	

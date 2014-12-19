@@ -139,7 +139,31 @@ void pauseCommand(char *Buf,int len,XHMotionUDPsock *xhSock)
 		}
 		SetWindowText(GetDlgItem(xhSock->m_parent,IDS_STATUS),buff);
 	}
-	
+	else if(Buf[0] == 0x60 && Buf[1] == (char)0XA3)
+	{
+
+		if (Buf[2] == 0XF4)
+		{
+
+			strcat(buff,"游戏运行");
+			MessageBox(xhSock->m_parent,"F4报警","驱动器报警",MB_OKCANCEL);
+			OnBtnStopClick(xhSock->m_parent,NULL,NULL,NULL);
+			OnBtnRunGameClick(xhSock->m_parent,NULL,NULL,NULL);
+		}
+		if (Buf[2] == 0XF7)
+		{
+
+			strcat(buff,"游戏运行");
+			MessageBox(xhSock->m_parent,"F7报警","驱动器报警",MB_OKCANCEL);
+			OnBtnStopClick(xhSock->m_parent,NULL,NULL,NULL);
+			OnBtnRunGameClick(xhSock->m_parent,NULL,NULL,NULL);
+		}
+		else
+		{
+			sprintf(buff,"游戏运行错误%d",Buf[2]);
+		}
+		SetWindowText(GetDlgItem(xhSock->m_parent,IDS_STATUS),buff);
+	}
 	
 	else if(Buf[0] == 0x61 && Buf[1] == (char)0XB0)
 	{

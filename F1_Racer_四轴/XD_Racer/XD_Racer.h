@@ -1,6 +1,6 @@
 #pragma once
 #include "resource.h"
-
+#include "XD_DOF.h"
 #include<vector>
 #define dim(x) (sizeof(x)/sizeof(x[0]))
 
@@ -33,13 +33,13 @@ public:
 };
 
 
-#define MAX_AXIS_LONG  45
+
 
 extern float axis1;
 extern float axis2;
 extern float axis3;
 extern float axis4;
-
+extern InputVector input;
 extern std::vector<MMData> gMMDataList;
 extern std::vector<KKData> gKKDataList;
 extern bool g_bDownlod;
@@ -68,3 +68,4 @@ void ConnectControlHost(HWND hDlg);
 void SendControlReady(HWND hDlg);
 void openKeyData();
 void SetKeyDown();
+void InputToAxis();

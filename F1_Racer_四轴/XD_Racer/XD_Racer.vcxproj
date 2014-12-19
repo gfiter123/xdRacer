@@ -94,6 +94,7 @@
     <ClCompile Include="XHControlSocket.cpp" />
     <ClCompile Include="XHMotionUDPsock.cpp" />
     <ClCompile Include="XHUDPSocket.cpp" />
+    <ClCompile Include="XH_INPUTTOAXIS.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="F1RacerMotionProtocal.h" />
@@ -106,6 +107,7 @@
     <ClInclude Include="XHControlSocket.h" />
     <ClInclude Include="XHMotionUDPsock.h" />
     <ClInclude Include="XHUDPSocket.h" />
+    <ClInclude Include="XH_INPUTTOAXIS.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="XD_Racer.rc" />

@@ -8,7 +8,7 @@
 
 #include "XD_Racer.h"
 #include "XHConfig.h"
-
+#include "XH_INPUTTOAXIS.h"
 #define  MAX_PLUSE    80000
 #define  INTERVAL_TIME  0.02
 #pragma comment(lib,"ws2_32.lib")
@@ -302,7 +302,7 @@ float axis1 = 0.0;
 float axis2 = 0.0;
 float axis3 = 0.0;
 float axis4 = 0.0;
-
+InputVector input = {0};
 static void MakePlane(int & axi1,int & axi2,int & axi3,int & axi4)
 {
 	float x[4] = {-270,270,-270,270};
@@ -347,24 +347,27 @@ DWORD WINAPI PositionThreadProc(LPVOID lp)
 	}
 	int tempx = 0;
 	int tempy = 0;
-	com = MakeRunGameData_1(tempx,tempy);
+	bool bTemp;
+	com = MakeRunGameData_1(tempx,tempy,bTemp);
 	motionSocket->Send1(com);
 	Sleep(20);
 	tempx = 0;
 	tempy = 0;
-	com = MakeRunGameData_2(tempx,tempy);
+	com = MakeRunGameData_2(tempx,tempy,bTemp);
 	motionSocket->Send2(com);
 
 	while (Leave_Thread)
 	{
 		WaitForSingleObject(hEvent,INFINITE);
 		ResetEvent(hEvent);
+
+		InputToAxis();
 		x1 = axis1*MAX_PLUSE/MAX_AXIS_LONG;
 		y1 = axis2*MAX_PLUSE/MAX_AXIS_LONG;
 		x2 = axis3*MAX_PLUSE/MAX_AXIS_LONG;
 		y2 = axis4*MAX_PLUSE/MAX_AXIS_LONG;
 		
-		if (x1 >= MAX_PLUSE/2)
+		/*if (x1 >= MAX_PLUSE/2)
 		{
 			x1 = MAX_PLUSE/2;
 			OutputDebugString("x\n");
@@ -404,7 +407,7 @@ DWORD WINAPI PositionThreadProc(LPVOID lp)
 		{
 			y2 = -MAX_PLUSE/2;
 			OutputDebugString("y");
-		}
+		}*/
 		//MakePlane(x1,y1,x2,y2);
 		
 		SendMessageW(GetDlgItem(g_hDlg,IDS_AXIS1),TBM_SETPOS, (WPARAM)1,(LPARAM)(int)x1*65535/MAX_PLUSE);
@@ -413,16 +416,29 @@ DWORD WINAPI PositionThreadProc(LPVOID lp)
 		SendMessageW(GetDlgItem(g_hDlg,IDS_AXIS4),TBM_SETPOS, (WPARAM)1,(LPARAM)(int)y2*65535/MAX_PLUSE);
 
 		
-
-		com = MakeRunGameData_1(x1,y1);
+		bool bChaoCheng = false;
+		MotionProtocal com1 = MakeRunGameData_1(x1,y1,bChaoCheng);
+		if(bChaoCheng)
+		{
+		//	input = input * 0.9;
+		//	goto BiLi;
+		}
 		
-		motionSocket->Send1(com);
+		MotionProtocal com2 = MakeRunGameData_2(x2,y2,bChaoCheng);
+
+		if(bChaoCheng)
+		{
+		//	input = input * 0.9;
+		//	goto BiLi;
+		}
+
+		motionSocket->Send1(com1);
 		Sleep(20);
-		com = MakeRunGameData_2(x2,y2);
+
 		static int count = 0;
 		fprintf(fp,"%d\t%d\t%d\t%d\t%d\t\n",count++,x1,y1,x2,y2);
 		fflush(fp);
-		motionSocket->Send2(com);
+		motionSocket->Send2(com2);
 
 	}
 	fclose(fp);
@@ -654,5 +670,25 @@ void SetKeyDown()
 	{
 		SendKeyMessage("DiRT 3",gKKDataList[index].nKey_value);
 	}
+	
+}
+
+void InputToAxis()
+{
+	AvaOula(input);
+	KaermanOula(input);
+	OutputVector output;
+	GetXD_DOFData(&input,&output);
+
+	axis1 = output.l1;
+	axis2 = output.l2;
+	axis3 = output.l3;
+	axis4 = output.l4;
+
+
+	//AvaCrest(axis1,axis2,axis3,axis4);
+	//KaermanCrest(axis1,axis2,axis3,axis4);
+	TakeMaxAxis(axis1,axis2,axis3,axis4);
+
 	
 }

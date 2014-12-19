@@ -33,6 +33,9 @@
     <ClCompile Include="XHUDPSocket.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="XH_INPUTTOAXIS.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="F1RacerMotionProtocal.h">
@@ -63,6 +66,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="XHUDPSocket.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="XH_INPUTTOAXIS.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

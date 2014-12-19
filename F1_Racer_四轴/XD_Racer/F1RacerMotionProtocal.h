@@ -119,39 +119,46 @@ static MotionProtocal MakeRunMovieData(int num,byte mode)
 	return com;
 }
 
-static MotionProtocal MakeRunGameData_1(int  &x,int  &y)
+static MotionProtocal MakeRunGameData_1(int  &x,int  &y,bool &bChaoCheng)
 {
-	
+	bChaoCheng = false;
 	static int old_x = 0;
 	static int old_y = 0;
 	int dx = x - old_x;
 	int dy = y - old_y;
 	char temp[200];
+	MotionProtocal com = {0};
 	if(dx > MAX_SINGLE_PLUSE)   
 	{
-		
+		bChaoCheng = true;
 		sprintf(temp,"x-%d\n",dx - MAX_SINGLE_PLUSE);
 		OutputDebugString(temp);
 		dx = MAX_SINGLE_PLUSE;
+		//return com;
 	}
 	else if (dx < -MAX_SINGLE_PLUSE)
 	{
-		
+		bChaoCheng = true;
 		sprintf(temp,"x-%d\n",dx + MAX_SINGLE_PLUSE);
 		OutputDebugString(temp);
 		dx = -MAX_SINGLE_PLUSE;
+		//return com;
 	}
 	if(dy > MAX_SINGLE_PLUSE) 
 	{
+		bChaoCheng = true;
 		sprintf(temp,"y-%d\n",dy - MAX_SINGLE_PLUSE);
 			OutputDebugString(temp);
 			dy = MAX_SINGLE_PLUSE;
+			//return com;
 			
 	}
 	else if(dy < -MAX_SINGLE_PLUSE)
 	{
+		bChaoCheng = true;
 		dy = -MAX_SINGLE_PLUSE;
 		OutputDebugString("-dy\n");
+		//turn com;
 	}
 	FILE *fp;
 	if ((fp = fopen("d:\\2.txt","a+")) == NULL)
@@ -165,7 +172,7 @@ static MotionProtocal MakeRunGameData_1(int  &x,int  &y)
 	fclose(fp);
 	int dsx = old_x + dx;//dx;
 	int dsy = old_y + dy;//dy;
-	MotionProtocal com;
+	
 	com.command[0] = NORMAL_OPT;
 	com.command[1] = RUN_GAME_DATA;
 	com.command[2] = 0xff &(*((char *)&dsx + 3));
@@ -186,17 +193,40 @@ static MotionProtocal MakeRunGameData_1(int  &x,int  &y)
 	
 	return com;
 }
-static MotionProtocal MakeRunGameData_2(int &x,int &y)
+static MotionProtocal MakeRunGameData_2(int &x,int &y,bool &bChaoCheng)
 {
-
+	MotionProtocal com = {0};
+	bChaoCheng = false;
 	static int old_x = 0;
 	static int old_y = 0;
 	int dx = x - old_x;
 	int dy = y - old_y;
-	if(dx > MAX_SINGLE_PLUSE)   dx = MAX_SINGLE_PLUSE;
-	else if (dx < -MAX_SINGLE_PLUSE) dx = -MAX_SINGLE_PLUSE;
-	if(dy > MAX_SINGLE_PLUSE)   dy = MAX_SINGLE_PLUSE;
-	else if(dy < -MAX_SINGLE_PLUSE) dy = -MAX_SINGLE_PLUSE;
+	if(dx > MAX_SINGLE_PLUSE)   
+	{
+			bChaoCheng = true;
+			dx = MAX_SINGLE_PLUSE;
+			
+	}
+	
+	else if (dx < -MAX_SINGLE_PLUSE) 
+	{
+			dx = -MAX_SINGLE_PLUSE;
+			bChaoCheng = true;
+			
+
+	}
+	if(dy > MAX_SINGLE_PLUSE)
+	{
+			dy = MAX_SINGLE_PLUSE;
+			bChaoCheng = true;
+			
+	}
+	else if(dy < -MAX_SINGLE_PLUSE) 
+	{
+			dy = -MAX_SINGLE_PLUSE;
+			bChaoCheng = true;
+			
+	}
 	FILE *fp;
 	if ((fp = fopen("d:\\3.txt","a+")) == NULL)
 	{
@@ -209,7 +239,7 @@ static MotionProtocal MakeRunGameData_2(int &x,int &y)
 	fclose(fp);
 	int dsx = old_x + dx;//dx;
 	int dsy = old_y + dy;//dy;
-	MotionProtocal com;
+	
 	com.command[0] = NORMAL_OPT;
 	com.command[1] = RUN_GAME_DATA;
 	com.command[2] = 0xff &(*((char *)&dsx + 3));
